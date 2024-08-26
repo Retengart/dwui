@@ -7,5 +7,5 @@ Dependencies for GNU/Linux:
 - Zenity
 - DwarFS universal binary named "dwarfs-u" in your PATH
 
-![image](https://github.com/user-attachments/assets/b30a908b-77f6-446d-b3a5-6e2f15ac82c4)
-![image](https://github.com/user-attachments/assets/f2e31208-4b09-47f0-a3ed-1d80d867c082)
+![image](https://github.com/user-attachments/assets/40709b25-2f17-48b1-89a1-bebd3a944cb7)
+![image](https://github.com/user-attachments/assets/9fa0ee67-c26c-4fe2-9474-35302dd21521)
