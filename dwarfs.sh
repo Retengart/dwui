@@ -2,6 +2,7 @@
 zenity(){
     /usr/bin/zenity "$@" 2>/dev/null
 }
+
 # Function to mount a DwarFS filesystem with real-time output
 mount_dwarfs() {
   local input_file=$(zenity --file-selection --title="Select DwarFS Image" --file-filter="*.dwarfs")
@@ -78,8 +79,38 @@ create_dwarfs_image() {
   fi
 }
 
-# Main GUI to choose between mount, unmount, and create image
-choice=$(zenity --list --title="DwarFS GUI" --column="Action" "Mount" "Unmount" "Create Image" --height=350 --width=300)
+# Function to extract a DwarFS image
+extract_dwarfs_image() {
+  local input_file=$(zenity --file-selection --title="Select DwarFS Image to Extract" --file-filter="*.dwarfs")
+  if [ -z "$input_file" ]; then
+    zenity --error --text="No file selected!"
+    exit 1
+  fi
+
+  local output_dir=$(zenity --file-selection --directory --title="Select Output Directory")
+  if [ -z "$output_dir" ]; then
+    zenity --error --text="No output directory selected!"
+    exit 1
+  fi
+
+  # Run the command and display output in a Zenity progress dialog
+  (
+    echo "# Extracting $input_file to $output_dir..."
+    dwarfs-u --tool=dwarfsextract -i "$input_file" -o "$output_dir" 2>&1 | while read -r line; do
+      echo "# $line"
+    done
+    echo "100" # Indicate completion
+  ) | zenity --progress --title="Extracting DwarFS Image" --text="Initializing..." --auto-close --no-cancel
+
+  if [ $? -eq 0 ]; then
+    zenity --info --text="DwarFS image extracted successfully to $output_dir"
+  else
+    zenity --error --text="Failed to extract the DwarFS image!"
+  fi
+}
+
+# Main GUI to choose between mount, unmount, create image, and extract image
+choice=$(zenity --list --title="DwarFS GUI" --column="Action" "Create Image" "Mount" "Unmount" "Extract Image" --height=350 --width=300)
 
 case $choice in
   "Mount")
@@ -90,6 +121,9 @@ case $choice in
     ;;
   "Create Image")
     create_dwarfs_image
+    ;;
+  "Extract Image")
+    extract_dwarfs_image
     ;;
   *)
     zenity --error --text="Invalid choice!"
