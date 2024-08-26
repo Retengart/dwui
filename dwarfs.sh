@@ -70,12 +70,12 @@ create_dwarfs_image() {
       echo "# $line"
     done
     echo "100" # Indicate completion
-  ) | zenity --progress --title="Creating DwarFS Image" --text="Initializing..." --auto-close --no-cancel
+  ) | zenity --progress --title="Creating DwarFS Image" --text="Initializing..." --auto-close --auto-kill
 
   if [ $? -eq 0 ]; then
     zenity --info --text="DwarFS image created successfully at $output_file"
   else
-    zenity --error --text="Failed to create DwarFS image!"
+    zenity --error --text="Failed to create DwarFS image or operation was canceled!"
   fi
 }
 
