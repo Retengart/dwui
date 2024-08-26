@@ -8,13 +8,13 @@ mount_dwarfs() {
   local input_file=$(zenity --file-selection --title="Select DwarFS Image" --file-filter="*.dwarfs")
   if [ -z "$input_file" ]; then
     zenity --error --text="No file selected!"
-    exit 1
+    return
   fi
 
   local mount_point=$(zenity --file-selection --directory --title="Select Mount Point")
   if [ -z "$mount_point" ]; then
     zenity --error --text="No mount point selected!"
-    exit 1
+    return
   fi
 
   # Run the command and display output in a Zenity progress dialog
@@ -38,7 +38,7 @@ unmount_dwarfs() {
   local mount_point=$(zenity --file-selection --directory --title="Select Mount Point to Unmount")
   if [ -z "$mount_point" ]; then
     zenity --error --text="No mount point selected!"
-    exit 1
+    return
   fi
 
   fusermount -u "$mount_point"
@@ -54,13 +54,13 @@ create_dwarfs_image() {
   local input_folder=$(zenity --file-selection --directory --title="Select Input Folder")
   if [ -z "$input_folder" ]; then
     zenity --error --text="No input folder selected!"
-    exit 1
+    return
   fi
 
   local output_file=$(zenity --file-selection --filename=new --save --title="Save DwarFS Image As")
   if [ -z "$output_file" ]; then
     zenity --error --text="No output file specified!"
-    exit 1
+    return
   fi
 
   # Run the command and display output in a Zenity progress dialog
@@ -84,13 +84,13 @@ extract_dwarfs_image() {
   local input_file=$(zenity --file-selection --title="Select DwarFS Image to Extract" --file-filter="*.dwarfs")
   if [ -z "$input_file" ]; then
     zenity --error --text="No file selected!"
-    exit 1
+    return
   fi
 
   local output_dir=$(zenity --file-selection --directory --title="Select Output Directory")
   if [ -z "$output_dir" ]; then
     zenity --error --text="No output directory selected!"
-    exit 1
+    return
   fi
 
   # Run the command and display output in a Zenity progress dialog
@@ -109,24 +109,28 @@ extract_dwarfs_image() {
   fi
 }
 
-# Main GUI to choose between mount, unmount, create image, and extract image
-choice=$(zenity --list --title="DwarFS GUI" --column="Action" "Create Image" "Mount" "Unmount" "Extract Image" --height=350 --width=300)
+# Main loop to keep showing the GUI until the user exits
+while true; do
+  choice=$(zenity --list --title="DwarFS GUI" --column="Action" "Create Image" "Mount" "Unmount" "Extract Image" "QUIT" --height=400 --width=300)
 
-case $choice in
-  "Mount")
-    mount_dwarfs
-    ;;
-  "Unmount")
-    unmount_dwarfs
-    ;;
-  "Create Image")
-    create_dwarfs_image
-    ;;
-  "Extract Image")
-    extract_dwarfs_image
-    ;;
-  *)
-    zenity --error --text="Invalid choice!"
-    exit 1
-    ;;
-esac
+  case $choice in
+    "Mount")
+      mount_dwarfs
+      ;;
+    "Unmount")
+      unmount_dwarfs
+      ;;
+    "Create Image")
+      create_dwarfs_image
+      ;;
+    "Extract Image")
+      extract_dwarfs_image
+      ;;
+    "QUIT")
+      break
+      ;;
+    *)
+      zenity --error --text="Invalid choice!"
+      ;;
+  esac
+done
